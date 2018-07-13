@@ -2,15 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 class EmailAddress extends Component {
-  constructor() {
-    super();
-    this.state = {
-      cipher: true,
-      email: '',
-      linkText: '',
-      linkType: '',
-    };
-  }
+  state = {
+    cipher: true,
+    email: '',
+    linkText: '',
+    linkType: '',
+  };
 
   componentDidMount() {
     // this.setState({ email: this.props.email });
@@ -19,7 +16,7 @@ class EmailAddress extends Component {
     this.setLinkType();
   }
 
-  setLinkType() {
+  setLinkType = () => {
     const { linkText } = this.props;
     console.log(this.props);
     let type;
@@ -37,13 +34,13 @@ class EmailAddress extends Component {
       link = 'Email Now';
     }
     this.setState({ linkText: link, linkType: type });
-  };
+  }
 
-  splitEmail(email) {
+  splitEmail = (email) => {
     return email.split('');
-  };
+  }
 
-  unRot13(email) {
+  unRot13 = (email) => {
     const deciphered = [];
     const puncReplaced = email
       .replace(/\[(.*?)\]/g, '@')
@@ -63,9 +60,9 @@ class EmailAddress extends Component {
     }
     const joinEmail = deciphered.join('');
     this.setState({ email: joinEmail, cipher: false });
-  };
+  }
 
-  rot13(email) {
+  rot13 = (email) => {
     const splitEmail = this.splitEmail(email);
 
     const rotString = [];
@@ -87,13 +84,13 @@ class EmailAddress extends Component {
     }
     const joinEmail = rotString.join('');
     this.setState({ email: joinEmail, cipher: true });
-  };
+  }
 
-  handleCipher() {
+  handleCipher = () => {
     return this.state.cipher
       ? this.unRot13(this.state.email)
       : this.rot13(this.state.email);
-  };
+  }
 
   render() {
     return (
