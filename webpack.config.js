@@ -12,10 +12,12 @@ module.exports = {
                 test: /\.js(x)$/,
                 use: "babel-loader",
                 exclude: /node_modules/
-            },
-            {
-                test: /\.css$/,
-                use: ["style-loader", "css-loader"]
+                query: {
+                  presets: ['es2015', 'stage-0', 'react'],
+                  plugins: [
+                      'transform-class-properties',
+                  ],
+              },
             }
         ]
     },
