@@ -1,5 +1,5 @@
 {
-  "name": "bot-buster-email-obfuscation",
+  "name": "react-bot-buster-email-obfuscation",
   "version": "1.0.0",
   "description": "A email obfuscation package with multiple options to fool bots.",
   "main": "src/index.js",
