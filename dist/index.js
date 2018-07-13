@@ -44,7 +44,6 @@ var EmailAddress = function (_Component) {
     }, _this.setLinkType = function () {
       var linkText = _this.props.linkText;
 
-      console.log(_this.props);
       var type = void 0;
       var link = void 0;
       if (linkText) {

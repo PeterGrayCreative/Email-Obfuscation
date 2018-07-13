@@ -18,7 +18,6 @@ class EmailAddress extends Component {
 
   setLinkType = () => {
     const { linkText } = this.props;
-    console.log(this.props);
     let type;
     let link;
     if (linkText) {
