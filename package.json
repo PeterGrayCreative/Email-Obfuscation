@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "A email obfuscation package with multiple options to fool bots.",
   "main": "src/index.js",
-  "publishConfig": {
-    "access": "restricted"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --mode development",
