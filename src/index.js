@@ -113,7 +113,7 @@ class EmailAddress extends Component {
 
 EmailAddress.propTypes = {
   email: PropTypes.string,
-  linkText: PropTypes.string,
+  linkText: PropTypes.object,
 };
 
 export default EmailAddress;
