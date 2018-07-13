@@ -15,6 +15,8 @@ and turns it into this:
 
 Using **Rot13** in addition to replacing important characters that a bot will use to pattern match your email address should be nearly invisible to most scrape bots.
 
+**The Email address is unobfuscated on hover in both the mailto and link if you choose to use the email.**
+
 ### Prerequisites
 
 This module is written for React.
