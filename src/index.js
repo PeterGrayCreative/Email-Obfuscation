@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 
 class EmailAddress extends Component {
   state = {
-    cipher: true,
+    cipher: false,
     email: '',
+    cipheredEmail: '',
+    decipheredEmail: '',
     linkText: '',
     linkType: '',
   };
@@ -12,6 +14,8 @@ class EmailAddress extends Component {
   componentDidMount() {
     // this.setState({ email: this.props.email });
     const { email } = this.props;
+    // caches the original email so rot13 doesn't need to be performed twice
+    this.setState({ decipheredEmail: email });
     this.rot13(email);
     this.setLinkType();
   }
@@ -33,63 +37,59 @@ class EmailAddress extends Component {
       link = 'Email Now';
     }
     this.setState({ linkText: link, linkType: type });
-  }
+  };
 
-  splitEmail = (email) => {
-    return email.split('');
-  }
+  unRot13 = () => {
+    const { decipheredEmail } = this.state;
+    // Sets email to the already-cached deciphered email
+    this.setState({ email: decipheredEmail, cipher: false });
+  };
 
-  unRot13 = (email) => {
-    const deciphered = [];
-    const puncReplaced = email
-      .replace(/\[(.*?)\]/g, '@')
-      .replace(/_(.*?)_/g, '.');
-    const splitEmail = this.splitEmail(puncReplaced);
+  rot13 = email => {
 
-    for (let i = 0; i <= splitEmail.length - 1; i++) {
-      const code = splitEmail[i].charCodeAt(0);
-      if (code === '\u200b') {
-      } else if ((code >= 65 && code <= 77) || (code >= 97 && code <= 109)) {
-        deciphered.push(String.fromCharCode(code + 13));
-      } else if ((code >= 78 && code <= 90) || (code >= 110 && code <= 122)) {
-        deciphered.push(String.fromCharCode(code - 13));
-      } else {
-        deciphered.push(String.fromCharCode(code));
-      }
+    if (this.state.cipheredEmail !== '') {
+      const { cipheredEmail } = this.state;
+      this.setState({ email: cipheredEmail, cipher: true });
+    } else {
+
+      // Converted to an async function in case of large numbers of components
+      const cipherEmail = () => {
+        return new Promise((resolve, reject) => {
+          const splitEmail = email.split('');
+          
+          const rotString = splitEmail.map((char) => {
+            const code = char.charCodeAt(0);
+            if ((code >= 65 && code <= 77) || (code >= 97 && code <= 109)) {
+              return String.fromCharCode(code + 13);
+            } else if (
+              (code >= 78 && code <= 90) ||
+              (code >= 110 && code <= 122)
+            ) {
+              return String.fromCharCode(code - 13);
+            } else if (code === 64) {
+              return '[at]';
+            } else if (code === 46) {
+              return '_dot_';
+            } else {
+              return char;
+            }
+          }).join('');
+          resolve(rotString);
+        });
+
+      };
+
+      cipherEmail().then((email) => {
+        // Sets the email state and caches the rot13 result
+        this.setState({ email: email, cipheredEmail: email, cipher: true });
+      });
     }
-    const joinEmail = deciphered.join('');
-    this.setState({ email: joinEmail, cipher: false });
-  }
 
-  rot13 = (email) => {
-    const splitEmail = this.splitEmail(email);
-
-    const rotString = [];
-
-    for (let i = 0; i <= splitEmail.length - 1; i++) {
-      const code = splitEmail[i].charCodeAt(0);
-      if (code === '\u200b') {
-      } else if ((code >= 65 && code <= 77) || (code >= 97 && code <= 109)) {
-        rotString.push(String.fromCharCode(code + 13));
-      } else if ((code >= 78 && code <= 90) || (code >= 110 && code <= 122)) {
-        rotString.push(String.fromCharCode(code - 13));
-      } else if (code === 64) {
-        rotString.push('[at]');
-      } else if (code === 46) {
-        rotString.push('_dot_');
-      } else {
-        rotString.push(String.fromCharCode(code));
-      }
-    }
-    const joinEmail = rotString.join('');
-    this.setState({ email: joinEmail, cipher: true });
-  }
+  };
 
   handleCipher = () => {
-    return this.state.cipher
-      ? this.unRot13(this.state.email)
-      : this.rot13(this.state.email);
-  }
+    return this.state.cipher ? this.unRot13() : this.rot13(this.state.email);
+  };
 
   render() {
     return (

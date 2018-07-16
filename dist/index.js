@@ -37,8 +37,10 @@ var EmailAddress = function (_Component) {
     }
 
     return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = EmailAddress.__proto__ || Object.getPrototypeOf(EmailAddress)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
-      cipher: true,
+      cipher: false,
       email: '',
+      cipheredEmail: '',
+      decipheredEmail: '',
       linkText: '',
       linkType: ''
     }, _this.setLinkType = function () {
@@ -59,48 +61,49 @@ var EmailAddress = function (_Component) {
         link = 'Email Now';
       }
       _this.setState({ linkText: link, linkType: type });
-    }, _this.splitEmail = function (email) {
-      return email.split('');
-    }, _this.unRot13 = function (email) {
-      var deciphered = [];
-      var puncReplaced = email.replace(/\[(.*?)\]/g, '@').replace(/_(.*?)_/g, '.');
-      var splitEmail = _this.splitEmail(puncReplaced);
+    }, _this.unRot13 = function () {
+      var decipheredEmail = _this.state.decipheredEmail;
+      // Sets email to the already-cached deciphered email
 
-      for (var i = 0; i <= splitEmail.length - 1; i++) {
-        var code = splitEmail[i].charCodeAt(0);
-        if (code === '\u200B') {} else if (code >= 65 && code <= 77 || code >= 97 && code <= 109) {
-          deciphered.push(String.fromCharCode(code + 13));
-        } else if (code >= 78 && code <= 90 || code >= 110 && code <= 122) {
-          deciphered.push(String.fromCharCode(code - 13));
-        } else {
-          deciphered.push(String.fromCharCode(code));
-        }
-      }
-      var joinEmail = deciphered.join('');
-      _this.setState({ email: joinEmail, cipher: false });
+      _this.setState({ email: decipheredEmail, cipher: false });
     }, _this.rot13 = function (email) {
-      var splitEmail = _this.splitEmail(email);
 
-      var rotString = [];
+      if (_this.state.cipheredEmail !== '') {
+        var cipheredEmail = _this.state.cipheredEmail;
 
-      for (var i = 0; i <= splitEmail.length - 1; i++) {
-        var code = splitEmail[i].charCodeAt(0);
-        if (code === '\u200B') {} else if (code >= 65 && code <= 77 || code >= 97 && code <= 109) {
-          rotString.push(String.fromCharCode(code + 13));
-        } else if (code >= 78 && code <= 90 || code >= 110 && code <= 122) {
-          rotString.push(String.fromCharCode(code - 13));
-        } else if (code === 64) {
-          rotString.push('[at]');
-        } else if (code === 46) {
-          rotString.push('_dot_');
-        } else {
-          rotString.push(String.fromCharCode(code));
-        }
+        _this.setState({ email: cipheredEmail, cipher: true });
+      } else {
+
+        // Converted to an async function in case of large numbers of components
+        var cipherEmail = function cipherEmail() {
+          return new Promise(function (resolve, reject) {
+            var splitEmail = email.split('');
+
+            var rotString = splitEmail.map(function (char) {
+              var code = char.charCodeAt(0);
+              if (code >= 65 && code <= 77 || code >= 97 && code <= 109) {
+                return String.fromCharCode(code + 13);
+              } else if (code >= 78 && code <= 90 || code >= 110 && code <= 122) {
+                return String.fromCharCode(code - 13);
+              } else if (code === 64) {
+                return '[at]';
+              } else if (code === 46) {
+                return '_dot_';
+              } else {
+                return char;
+              }
+            }).join('');
+            resolve(rotString);
+          });
+        };
+
+        cipherEmail().then(function (email) {
+          // Sets the email state and caches the rot13 result
+          _this.setState({ email: email, cipheredEmail: email, cipher: true });
+        });
       }
-      var joinEmail = rotString.join('');
-      _this.setState({ email: joinEmail, cipher: true });
     }, _this.handleCipher = function () {
-      return _this.state.cipher ? _this.unRot13(_this.state.email) : _this.rot13(_this.state.email);
+      return _this.state.cipher ? _this.unRot13() : _this.rot13(_this.state.email);
     }, _temp), _possibleConstructorReturn(_this, _ret);
   }
 
@@ -109,7 +112,9 @@ var EmailAddress = function (_Component) {
     value: function componentDidMount() {
       // this.setState({ email: this.props.email });
       var email = this.props.email;
+      // caches the original email so rot13 doesn't need to be performed twice
 
+      this.setState({ decipheredEmail: email });
       this.rot13(email);
       this.setLinkType();
     }
