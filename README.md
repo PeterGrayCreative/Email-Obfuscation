@@ -26,11 +26,11 @@ This module is written for React.
 Install this component using your preferred package manager:
 
 ```
-npm i bot-buster-email-obfuscation
+npm i react-bot-buster-email-obfuscation
 
 or
 
-yarn add bot-buster-email-obfuscation
+yarn add react-bot-buster-email-obfuscation
 ```
 
 Import it just like any other module:
